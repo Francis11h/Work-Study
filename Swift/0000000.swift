@@ -225,6 +225,84 @@ struct CardView: View {
 
 
 
+‘-----------‘
+  "终极简写"
+‘-----------‘
+
+
+// 不再需要这个  下面代替了
+func createCardContent(pairIndex: Int) -> String {
+   return "😂"
+}
+
+1. 复制除了名之后所有的 到 "cardContentFactory:" 之后
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2, cardContentFactory: (pairIndex: Int) -> String {
+          return "😃"
+      })   
+      // inlining of functions in Swift is called a closure
+
+2. 
+   2.1 删去 { 改为 in  
+   2.2 然后把 { 放到 : 后
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2, cardContentFactory: { (pairIndex: Int) -> String in
+          return "😃"
+      })   
+      // inlining of functions in Swift is called a closure
+
+
+3. 因为 后面有声明 　(Int) -> CardContent) 所以可以省略  "1.类型的声明Int 2.返回符号 -> 3.返回类型 String"
+
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2, cardContentFactory: { (pairIndex) in
+          return "😃"
+      }) 
+  
+
+4.  同时 小括号 和 return 都可以省
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2, cardContentFactory: { pairIndex in "😃" }) 
+
+5. 由于 cardContentFactory: { pairIndex in "😃" } 是最后一个参数 类比 ZStack HStack
+   也可类比   ForEach(0..<4) { index in
+               CardView()   
+            }
+
+    就是 可以省去 keyword, (get rid of the keyword)
+    同时 put the curly brace thing outside, floating outside 
+
+    即 前面先写() 再跟 { ... }
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2) { pairIndex in "😃" }
+
+
+
+6.  由于 我们总是 返回 😃
+    所以 pairIndex 这东西没啥用 但是不能删 但是可以简写 mark it with an underbar
+
+private var model: MemoryGame<String> =
+      MemoryGame<String>(numberOfPairsOfCards: 2) { _ in "😃" }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -250,9 +328,33 @@ Model-View-ViewModel is different from MVC that the UIKit(old-style-ios) uses.
 	"Type system in Swift"
 ‘----------------------------‘
 
+6种 
+
+struct
+class
+protocol
+"Don't Care" type(aka generics)
+enum
+functions
 
 
+最大的区别
+struct is a value type 
+class is a reference type 
 
+Generics: array 算一种
+    var a = Array<Int>()
+    a.append(5)
+    a.append(20)
+
+functions:  举个例子 (Int, Int) -> Bool
+
+  func square(operand: Double) -> Double {
+    return operand * operand
+  }
+
+  operation = square
+  let result1 = operation(4)
 
 
 
