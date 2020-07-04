@@ -483,9 +483,31 @@ extension Array where Element: Greatness {
 ‘---------‘
   "enum"
 ‘---------‘
+it can only have discrete states离散状态
+it is a value type, so it is copied as it is passed around
+
+与其他语言不同的是 每个case可以有一些其他附加的属性
+
+enum FastFoodMenuItem {
+  case hamburger(numberOfPatties: Int)
+  case fries(size: FryOrderSize)
+  case drink(String, ounces: Int)   //ounces盎司
+  case cookie
+}
 
 
+A enum's state is checked with a switch statement(i.e. 不是用if)...
 
+var menuItem = FastFoodMenuItem.hamburger(patties: 2)
+
+switch menuItem {
+  // case FastFoodMenuItem.hamburger: print("burger")   // swift 可以 infer 可以简写
+  case .hamburger: print("burger")
+  case .fries: break          //如果不想继续了 
+  case .drink: print("drink")
+  default: print("other")     //默认值
+  ...
+}
 
 
 
@@ -499,8 +521,23 @@ extension Array where Element: Greatness {
 
 CGFloat
 CGSize
+CGPoint
+
+GeometryReader  { geometry in 
+..
+}
 
 
+
+
+
+
+
+
+
+‘---------------‘
+  "Optional"
+‘---------------‘
 
 
 
