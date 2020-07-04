@@ -306,6 +306,7 @@ private var model: MemoryGame<String> =
 
 
 
+
 ‘-------------‘
 	"MVVM"
 ‘-------------‘
@@ -347,6 +348,7 @@ Generics: array 算一种
     a.append(5)
     a.append(20)
 
+
 functions:  举个例子 (Int, Int) -> Bool
 
   func square(operand: Double) -> Double {
@@ -356,6 +358,147 @@ functions:  举个例子 (Int, Int) -> Bool
   operation = square
   let result1 = operation(4)
 
+
+
+
+
+
+
+
+
+
+‘-------------‘
+  "reactive"
+‘-------------‘
+ViewModel
+class EmojiMemoryGame: ObservableObject {   // ObservableObject 这个 constrain(即 protocol) 用来实现 reactive 即实时更新
+    @Published private var model: MemoryGame<String> = EmojiMemoryGame.createMemoryGame()   // property wrapper 即自动 send
+    ......
+}
+
+
+View
+
+struct EmojiMemoryGameView: View {
+    //@ObservedObject   when it seens this viewModel publishing, it redraws the view
+    @ObservedObject var viewModel: EmojiMemoryGame  
+    ......
+}
+
+
+
+
+
+
+
+
+‘-------------‘
+  "protocol"
+‘-------------‘
+
+类似于 java 中的 接口
+有 functions 和 var 但是没有实现 implementation
+
+举例样例
+protocol Moveable {
+  func move(by: Int)
+  var hasMoved: Bool { get }
+  var distanceFromStrat: Int { get set}
+}
+
+the { } on the vars just say whether it's read only or a var whose value can also be set
+
+‘-------------------------------------------------------------‘
+any other type can claim 声明 to implement protocol(Moveable)
+
+struct 可以实现 举例
+struct PortableThing: Moveable {
+  // must implement move(by: ), hasMoved, and distanceFromStrat here
+}
+
+‘--------------------‘
+同时 protocol 可以继承
+
+先用 Vehicle继承 Moveable
+
+protocol Vehicle: Moveable {
+  var passengerCount: Int { get set }
+}
+
+再用class 实现
+
+class Car: Vehicle {
+  // must implement move(by: ), hasMoved, and distanceFromStrat here
+}
+
+
+‘-------------------‘
+可以实现 多个 protocol
+
+class Car: Vehicle, Impoundable, Leasable {
+  // must implement move(by: ), hasMoved, and distanceFromStrat here
+  // and also must implement any funs/vars in Impoundable protocol & Leasable protocol
+}
+
+
+
+‘-------------------‘
+可以拓展补充 extension
+
+extension Vehicle {
+  func registerWithDMV() { /* implementation here */}
+}
+
+Now all vehicles can be registered With DMV
+
+
+
+‘-------------------------‘
+  "Generics and Protocol"
+‘-------------------------‘
+
+when we combine these Don't Care type(aka generics) with constrain and gain, we get superpowers.
+If we had a protocol like this...
+
+protocol Greatness {
+  func isGreaterThan(other: Self) -> Bool
+}
+(the type Self means the actual type of the thing implementing this protocol)
+...then we could add an extension to Array like this...
+
+extension Array where Element: Greatness {
+   var greatest: Element {
+     // for-loop through all the Elements
+     // which (inside the extension) we know each implements the Greatness Protocol
+     // and figure out which one is greatest by calling isGreaterThan(other: ) on them
+     return the greatest by calling isGreaterThan on each Element
+   }
+}
+
+
+
+
+
+
+‘---------‘
+  "enum"
+‘---------‘
+
+
+
+
+
+
+
+
+
+‘---------------‘
+  "Layout 布局"
+‘---------------‘
+
+
+CGFloat
+CGSize
 
 
 
