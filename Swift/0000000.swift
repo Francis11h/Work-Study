@@ -539,6 +539,143 @@ GeometryReader  { geometry in
   "Optional"
 ‘---------------‘
 
+An Optional is just an enum.
+
+enum Optional <T> { // a generic type, like Array<Element> or MemoryGame<CardContent>
+  case none
+  case some(T)  // the some case has associated value of type T
+}
+
+u can see that it cann only have two values: "is set(some)" or "not set(none)".
+
+"就是 可能会有 空值 nil/null 的时候的 处理办法"
+
+Where do we use Optional? 
+Any time we have a value that can sometimes be "not set" or "unspecified" or "undetermined"
+e.g. the return type of firstIndex(matching: ) if the matching thing is not in the Array.
+e.g. an index for the currently-face-up-card in our game when the game first starts
+
+
+‘--------‘
+语法
+
+Declaring something of type Optional <T>  can be done with syntax "T?" 后头加个问号就是简写
+
+
+var hello: String?               等价于     var hello: Optional<String> = .none
+var hello: String? = "hello"     等价于     var hello: Optional<String> = .some("hello")
+var hello: String? = nil         等价于     var hello: Optional<String> = .none
+
+
+
+
+
+
+
+"Access control"
+private(set) var cards: Array<Card>     //外部只能get不能set
+
+
+
+
+
+
+‘---------------‘
+  "@ViewBuilder"
+‘---------------‘
+
+a simple mechanism for supporting a more convenient syntax for lists of Views
+
+
+
+
+1. To factor out 分解出 the Views we use to make the front of a Card
+
+      @ViewBuilder
+      func front(of card: Card) -> some View {
+        RoundedRectangle(cornerRadius: 10)
+        RoundedRectangle(cornerRadius: 10).stroke()
+        ...
+      }
+
+2. can also use @ViewBuilder to mark a parameter that returns a View
+        struct  GeometryReader<Content> where Content: View {
+          init(@ViewBuilder content: @escaping (GeometryProxy) -> Content) {...}
+        }
+        the content is just a function that returns a View
+
+
+
+
+‘---------------‘
+  "Shape"
+‘---------------‘
+
+Shape is a protocol that inherits from View. (In other words, all Shapes are also Views)
+RoundedRectangle, Circle, Capsule（一种 oval椭圆） 都是 Shape
+
+func fill<S>(_ whatToFillWith: S) -> View where S: ShapeStyle {}
+S is a don't care
+
+
+
+when u want wo create your own shape, u need to implement this func
+
+func path(in rect: CGRect) -> Path {
+  return a Path
+}
+
+a Path that draws, Path 里面有很多函数来划线
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
