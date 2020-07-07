@@ -635,8 +635,19 @@ a Path that draws, Path 里面有很多函数来划线
 
 
 
+‘-----------------‘
+  "Animation动画"
+‘-----------------‘
 
+how do u make an animation "go" ?
 
+1. Implicity, by using the view modifier  .animation(Animation)
+
+2. Explicity, wrapping "withAnimation(Animation) { }" around code that might change things
+
+  transitions do not work with implicit animations, only explicit animations.
+  过渡                              
+  .transition(AnyTransition.scale)  //很多都封装在 AnyTransition: a type-erased version of transition
 
 
 
