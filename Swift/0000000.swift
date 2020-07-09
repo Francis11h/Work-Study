@@ -702,6 +702,112 @@ queue.sync { }
 
 
 
+‘--------------------‘
+    "UserDefaults"
+‘---------------=----‘
+simplest way to store data permanently (Persistence持久化)
+a persistent dictionary
+
+only can store PropertyList 既不是 protocol 也不是 struct 仅仅是一个概念 concept 
+                 it is any combination of String, Int, Bool, floating point, Date, Data, Array or Dictionary 
+
+所以要在 UserDefaults 存任何东西 都要先把他们变成 PropertyList
+用 "Codable" Protocol in Swift
+
+用法
+
+  let dafaults = UserDefaults.standard    // create an instance of UserDefaults
+  存
+  defaults.set(object, forKey: "someKey")   // object must be a PropertyList
+  defaults.setDouble(37.5, orKey: "myDouble") // for convenience
+
+  取
+  let i: Int = defaults.integer(forKey: "MyInteger")
+  let a: Data? = defaults.data(forKey: "MyData")
+  let u: URL? = defaults.url(forKey: "MyURL")
+  let strings: [String]? = defaults.stringArray(forKey: "MyString")
+  ...
+
+  let a = array(forKey: "MyArray")
+
+
+
+
+
+
+
+
+
+
+
+
+‘----------------‘
+    "Gesture"
+‘----------------‘
+
+
+
+1. Making your Views recognize gestures
+  用 ".gesture()"
+  myview.gesture(theGesture)  // theGesture must implement the Gesture Protocol
+
+2. creating a gesture
+  用 "some Gesture"
+  // var theGestureName: some Gesture {
+  //   return TapGesture(count: 2)
+  // } 
+
+3. Handling the Recognition of a Discrete Gesture, to do something
+  用 ".onEnded{ }"
+  var theGestureName: some Gesture {
+    return TapGesture(count: 2)
+              .onEnded{ /* do something*/} 
+  } 
+  ----->  可以简写 用 "on..."
+
+  myview.onTapGesture(count: Int) { /* do something*/ }
+  myview.onLongPressGesture(...) { /* do something*/ }
+
+
+4. Handling non-Discrete Gesture
+  
+  用 ".onEnded{ value in ...}" 但是 传给我们一个value 会告诉我们手势的状态
+
+  var theGestureName: some Gesture {
+    DragGesture(...)
+      .onEnded{ value in /* do something*/} 
+  } 
+
+
+5. 过程中改变 non-Discrete Gesture
+  ".updating"
+
+  @GestureState var myGestureState: MyGestureStateType = <starting value>
+
+  var theGestureName: some Gesture {
+    DragGesture(...)
+      .updating ($myGestureState) { value, myGestureState, tranction in   // $符号很重要 不能省略
+        myGestureState = /* usually something related to value*/
+      }
+      .onEnded{ value in /* do something*/} 
+  } 
+
+
+  ".onChanged {..}" 用在简单的情况 即 what u are doing is related directly to the actual finger positions // 一般用的不多
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
