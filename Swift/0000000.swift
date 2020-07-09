@@ -655,25 +655,50 @@ how do u make an animation "go" ?
 
 
 
+‘------------------------------‘
+    "Multithreading多线程"
+‘------------------------------‘
+It is never okay for a mobile application UI to be unresponsive to the user.
+
+we are going to not block UI by having all the stuff that would block the UI on a different thread of execution
+
+用 "Queue"
+
+Main Queue        --->    UI task
+Backgroud Queue   --->    long-lived, non-UI tasks
 
 
+GCD (Grand Central Dispatch)
+  1. getting access to a Queue
+  2. plopping a block of code on a queue
+
+-- 创建 
+
+DispatchQueue.main                   // the queue where all UI code must be posted
+DispatchQueue.global(qos: QoS)      // a non-UI queue with a certain quality of service
+
+QoS is one of the following...
+  .userInteractive      // do this fast, the UI depends on it!
+  .userInitiated        // the user just asked to do this, so do it Now   用户要求做的
+  .utility              // this needs to happen, but user didn't just ask for it
+  .background           // maintenannce tasks(cleanups, etc.)
 
 
+--把代码块放入队列 plopping a closure onto a queue
 
+let queue = DispatchQueue.main or DispatchQueue.global(qos: )
+queue.async { }
+queue.sync { }
+  // 同步 就会 block  所以我们真的很少用
+  // the second one blocks waitting for that closure to be picked off by its queue and completed.
+  // thus, u would never call .sync in UI code Because it would block the UI
+  // u might call it on a background queue (to wait for some UI to finish, for example) But even that is rare
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+所以大多数情况 我们只用  "queue.async { /* code */}"
+// always remember that .async will execute that closure "sometime later"   代码总会延缓执行
+// (whenever that closure gets to "the front of" the queue you plopped it onto) 
+// 只要 该闭包到达队列的 最前面，您便将其放入
+// your code needs to be tolerant of that
 
 
 
