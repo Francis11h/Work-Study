@@ -809,12 +809,176 @@ only can store PropertyList 既不是 protocol 也不是 struct 仅仅是一个�
 
 
 
+‘-----------------------‘
+    "Property Wrappers"
+‘-----------------------‘
+
+即 所有的 注解样式的 @something.....
+
+a property is actually a struct, which encapsulate some template behavior applied to the vars they wrap
+
+@statement         making a var live in the heap
+@Published         making a var publish its changes
+@ObservedObject    causing a view to redraw when a published change is detected
+
+
+
+property wrapper syntactic sugar
+
+@Published var emojiArt: EmojiArt = EmojiArt()
+        实际上是...is really just this struct..
+
+        struct Published {
+          var wrappedValue: emojiArt    //通常 wrappedValue 和 上面的 emojiArt类型一样
+          var projectedValue: Publisher<EmojiArt, Never>  //Never means never fails 
+        }
+        //and Swift makes these vars avaliable to u
+
+        //类型是Published it get initialized by creating a Publish Struct
+        var _emojiArt: Published = Published(wrappedValue: EmojiArt()) 
+        // 但是 我们不 access this _emojiArt very often 我们访问 emojiArt （不带下划线的）
+
+        var emojiArt : EmojiArt {
+          get { _emojiArt.wrappedValue }
+          set { _emojiArt.wrappedValue = newValue}
+        }
+
+        // there is another  var inside the  struct:    var projectedValue
+
+        u access this var (projectedValue) using "$"  $emojiArt
+        the projectedValue's type is up to the property wrapper 
+
+
+@Published:   当 wrappedValue 改变的时候 
+  1. publishes the change through its projectedValue($emojiArt), which is a publisher
+  2. it also invokes "objectWillChange.send()" in its enclosing "ObservableObject"
+
+@State: 
+  the wrappedValue is: anything(but almost certainly a value type)
+  what it does:  store the wrappedValue in the heap: when it changes, invalidates the View.
+  projectedValue($) is a "Binding" (to that value in the heap)
+
+@ObservedObject
+  the wrappedValue is: anything that implements the ObservableObject Protocol(ViewModels)
+  what it does:  invalidates the View when wrappedValue does objectWillChange.send()
+  projectedValue($) is a "Binding" (to the vars of the wrappedValue(a ViewModel))
+
+@Binding
+  the wrappedValue is: a value that is bound to something else
+  what it does:  gets/sets the value of the wrappedValue from some other source
+  what it does:  when the bound-to value changes, it invalidates the View
+  projectedValue($) is a "Binding" (self; i.e. the Binding itself)
+
+哪里用Bindings
+all over the freaking危险/恐怖 place
+1. Getting text out of a TextField, the choice out of a Picker         //从TextField中获取文本，从Picker中进行选择
+2. Using a Toggle切换 or other state-modifying UI Elements             //使用Toggle或其他可修改状态的UI元素
+3. Finding out which item in a NavigationView was chosen              //找出在NavigationView中选择了哪个项目
+4, Finding out whether we're being targeted with a Drag(the isTargeted argument to onDrop)  //找出我们是否被Drag作为目标（onDrop的isTargeted参数)
+5. Binding our gesture state to the .updating function of a gesture   //将我们的手势状态绑定到手势的.updating函数
+6. knowing about a modally presented View's dismissal                 //了解以某种方式呈现的视图解雇
+
+In general, breaking our Views into smaller pieces (and sharing data with them)
+...
+
+
+"Bindings"  are all about having a single source of the truth
+
+
+
+
+---------------------
+
+实例
+
+Sharing @State (or an @ObservedObject's var) with other Views
+
+struct MyView: View {
+  @State var myString = "hello"
+  var body: View {
+    OtherView(sharedText: $myString)
+  }  
+} 
+
+struct OtherView: View {
+  @Binding var sharedText: String
+    var body: View {
+      Text(sharedText)
+  }  
+} 
+
+OtherView's body is a Text whose String is always the value of myString in MyView
+
+OtherView's sharedText is bound to MyView's myString.
+
+所以 可以修改一处 两处都会改变
+
+
+
+
+--------------------
+
+create a Binding to a constant value with Binging.constant(value)
+e.g. OtherView(sharedText: .constant("Howdy"))   will always show Howdy in OtherView
+
+
+
+
+
+--------------------‘
+    "Publisher"
+--------------------‘
+
+
+It is an object that emits values and possibly a failure object if it fails while doing so
+
+"Publisher<Output, Failure>"
+Output is the type of the thing this Publisher publishes
+Failure is the type of the thing it communicates if it fails while trying to publish
+
+e.g.
+
+Listening(subscribing) to a publisher
+
+1.  用 .sink() 函数  simply execute a closure whenever a Publisher publishes
+
+          cancellable = myPublisher.sink (
+              receiveCompletion: { result in ...},      // result is a Completion<Failure> enum
+              receiveValue: { thingThePublisherPublishes in ...}
+          )
+
+2. a View can listen to a Publisher too
+
+    .onReceive(publisher) { thingThePublisherPublishes in
+        // do whatever u want with thingThePublisherPublishes
+    }
+
+    .onReceive will automatically invalidate your View(causing a redraw)
+
+
+
+Publisher 从哪里来？
+
+1. " $ " in front of vars marked @Published
+2. "URLSession" 's  dataTaskPublisher (publishes the Data obtained from a URL)
+3. "Timer's publish" 's publish(every: ) (periodically publishes the current date and time as a Date)
+4. "NotificationCenter" 's publisher(for: ) (publishes otifications when system events happen)
 
 
 
 
 
 
+
+
+
+
+
+
+@Publishd's publisher to autosave
+.onReceive to automatically zoom to fit when our backgroundImage changes
+URLSession publisher to load image
+Add a palette调色板 Chooser(@Binding)
 
 
 
