@@ -975,12 +975,6 @@ Publisher 从哪里来？
 
 
 
-@Publishd's publisher to autosave
-.onReceive to automatically zoom to fit when our backgroundImage changes
-URLSession publisher to load image
-Add a palette调色板 Chooser(@Binding)
-
-
 
 
 
